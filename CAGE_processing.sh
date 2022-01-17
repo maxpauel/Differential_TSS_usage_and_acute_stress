@@ -220,3 +220,40 @@ write.table(tpm,'./Expression/tpm.txt',quote=F,sep='\t',col.names=T,row.names=T)
 q()
 n
 
+
+
+		# STEP 6 - ESTIMATE TSS FOR MUSCLE TISSUE USING RNA-SEQ DATA
+# Tools: 
+#	- SEASTAR, source - https://github.com/Xinglab/SEASTAR
+# Input files:
+#	- ./GSE120862/*.merged.bam - 12 merged by condition bam files from RNA-Seq experiment (only strand-specific data) - /https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120862
+#	- ./Homo_sapiens.GRCh38.101.gtf - Ensembl annotation file, source - http://ftp.ensembl.org/pub/release-101/gtf/homo_sapiens/Homo_sapiens.GRCh38.101.chr.gtf.gz
+#	-  - bowtie index files, source - https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+#	- -i genome size file,
+# Output files:
+#	- /seastar/tmp/tsgtf/nrtss.annotation - TSS annotation file, see more about other output in https://github.com/Xinglab/SEASTAR
+mkdir ./seastar
+SEASTAR.sh \
+-A ./GSE120862/D0.bam,./GSE120862/D2.bam,./GSE120862/D3.bam,./GSE120862/DR0.bam,./GSE120862/DR2.bam,./GSE120862/DR3.bam \
+-B ./GSE120862/P0.bam,./GSE120862/P2.bam,./GSE120862/P3.bam,./GSE120862/PR0.bam,./GSE120862/PR2.bam,./GSE120862/PR3.bam \
+-o ./seastar/ -g ./Homo_sapiens.GRCh38.101.gtf -i ./chr_size_true_ens.txt -s ./index/ -t U -S s -c 0.1 -p 8 -b U
+
+
+		# STEP 7 - ANNOTATE CAGE TSS CLUSTERS
+# Tools: 
+#	- R, R packages (rtracklayer, ggplot2)
+#	- bedtools
+#	- ./add_utrs_to_gff.py, source - https://ftp.ncbi.nlm.nih.gov/genomes/TOOLS/add_utrs_to_gff/add_utrs_to_gff.py
+# Input files:
+#	- ./Homo_sapiens.GRCh38.101.gtf - Ensembl annotation file, source - http://ftp.ensembl.org/pub/release-101/gtf/homo_sapiens/Homo_sapiens.GRCh38.101.chr.gtf.gz
+#	- ./GCF_000001405.39_GRCh38.p13_genomic.gff - Refseq annotation GFF, source -  - https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/annotation_releases/109.20200815/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.gff.gz
+#	- ./GCF_000001405.39_GRCh38.p13_genomic.gtf - Refseq annotation GTF, source - https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/annotation_releases/109.20200815/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.gtf.gz
+#	- ./GCF_000001405.39_GRCh38.p13_assembly_report.txt - Refseq assembly report file, source - https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/annotation_releases/109.20200815/GCF_000001405.39_GRCh38.p13/GCF_000001405.39_GRCh38.p13_assembly_report.txt
+#	- ./DPI/outPooled/tc.spi_merged.ctssMaxCounts11_ctssMaxTpm1.bed - robust CAGE TSS clusters
+#	- ./Expression/tpm.txt - summary table of normalized read counts (TPM - tags per million) by sample for each cluster
+#	- ./seastar/tmp/tsgtf/nrtss.annotation - SEASTAR output TSS annotation file
+# Output files:
+#	- ./Annotation/
+mkdir ./Annotation
+mkdir ./Annotation/temp
+Rscript ./Annotate_peaks.R
