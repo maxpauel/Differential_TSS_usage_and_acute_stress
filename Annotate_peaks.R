@@ -363,11 +363,11 @@ max=cbind(max1,max2,max3,max4,max5)
 TCann_max=merge(TCann,max,by.x='gene_name',by.y='row.names')
 
 for (i in 1:nrow(TCann_max)) {
-	maj=ifelse(TCann_max[i,3]<0.1*TCann_max[i,8]|
-	TCann_max[i,4]<0.1*TCann_max[i,9]|
-	TCann_max[i,5]<0.1*TCann_max[i,10]|
-	TCann_max[i,6]<0.1*TCann_max[i,11]|
-	TCann_max[i,7]<0.1*TCann_max[i,12], 'minor','major')
+	maj=ifelse(TCann_max[i,3]>0.1*TCann_max[i,8]|
+	TCann_max[i,4]>0.1*TCann_max[i,9]|
+	TCann_max[i,5]>0.1*TCann_max[i,10]|
+	TCann_max[i,6]>0.1*TCann_max[i,11]|
+	TCann_max[i,7]>0.1*TCann_max[i,12], 'major','minor')
 	TCann_max[i,13]=maj
 }
 
