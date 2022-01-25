@@ -228,15 +228,15 @@ n
 # Input files:
 #	- ./GSE120862/*.merged.bam - 12 merged by condition bam files from RNA-Seq experiment (only strand-specific data) - /https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120862
 #	- ./Homo_sapiens.GRCh38.101.gtf - Ensembl annotation file, source - http://ftp.ensembl.org/pub/release-101/gtf/homo_sapiens/Homo_sapiens.GRCh38.101.chr.gtf.gz
-#	- bowtie index files, source - https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-#	- genome size file
+#	- ./index/ - bowtie index files, source - https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+#	- ./chr_size.txt - genome size file
 # Output files:
 #	- /seastar/tmp/tsgtf/nrtss.annotation - TSS annotation file, see more about other output in https://github.com/Xinglab/SEASTAR
 mkdir ./seastar
 SEASTAR.sh \
 -A ./GSE120862/D0.bam,./GSE120862/D2.bam,./GSE120862/D3.bam,./GSE120862/DR0.bam,./GSE120862/DR2.bam,./GSE120862/DR3.bam \
 -B ./GSE120862/P0.bam,./GSE120862/P2.bam,./GSE120862/P3.bam,./GSE120862/PR0.bam,./GSE120862/PR2.bam,./GSE120862/PR3.bam \
--o ./seastar/ -g ./Homo_sapiens.GRCh38.101.gtf -i ./chr_size_true_ens.txt -s ./index/ -t U -S s -c 0.1 -p 8 -b U
+-o ./seastar/ -g ./Homo_sapiens.GRCh38.101.gtf -i ./chr_size.txt -s ./index/ -t U -S s -c 0.1 -p 8 -b U
 
 
 		# STEP 7 - ANNOTATE CAGE TSS CLUSTERS
