@@ -257,3 +257,20 @@ SEASTAR.sh \
 mkdir ./Annotation
 mkdir ./Annotation/temp
 Rscript ./Annotate_peaks.R
+
+
+		# STEP 8 - DIFFERENTIAL GENE EXPRESSION AND DIFFERENTIAL CAGE TSS USAGE
+# Tools: 
+#	- R, R packages (DESeq,DESeq2,DRIMSeq)
+# Input files:
+#	- ./Expression/counts.txt - summary table of read counts by sample for each cluster
+#	- ./Annotation/annotated_CAGE_TSS_clusters.txt - annotated by genes and genomic features CAGE TSS clusters
+#	- ./Expression/design.txt - design table of experiment (samples in rows, conditions in columns)
+# Output files:
+#	- ./Dif_gene_expression_and_tss_usage/P1-D_genes.txt, - ./Dif_gene_expression_and_tss_usage/P3-D_genes.txt, - ./Dif_gene_expression_and_tss_usage/P6-D_genes.txt - Differential gene expression for each condition
+#	- ./Dif_gene_expression_and_tss_usage/Dif_gene_expression.txt - summary of differential gene expression
+#	- ./Expression/DESeq2_normalized_counts.txt - DESeq2 normalized counts for CAGE TSS clusters
+#	- ./Dif_gene_expression_and_tss_usage/P1-D_dif_tss_usage.txt, ./Dif_gene_expression_and_tss_usage/P1-D_dif_tss_usage.txt, ./Dif_gene_expression_and_tss_usage/P1-D_dif_tss_usage.txt - Differential TSS usage by gene for each condition
+#	- ./Dif_gene_expression_and_tss_usage/Dif_tss_usage.txt - summary of differential TSS usage
+mkdir ./Dif_gene_expression_and_tss_usage
+Rscript ./Dif_gene_expression_and_tss_usage.R
