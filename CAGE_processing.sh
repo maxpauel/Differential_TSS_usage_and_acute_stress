@@ -253,7 +253,7 @@ SEASTAR.sh \
 #	- ./Expression/tpm.txt - summary table of normalized read counts (TPM - tags per million) by sample for each cluster
 #	- ./seastar/tmp/tsgtf/nrtss.annotation - SEASTAR output TSS annotation file
 # Output files:
-#	- ./Annotation/annotated_CAGE_TSS_clusters.txt
+#	- ./Annotation/annotated_CAGE_TSS_clusters.txt - annotated by genes and genomic features CAGE TSS clusters
 mkdir ./Annotation
 mkdir ./Annotation/temp
 Rscript ./Annotate_peaks.R
