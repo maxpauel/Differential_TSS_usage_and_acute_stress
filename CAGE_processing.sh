@@ -228,8 +228,8 @@ n
 # Input files:
 #	- ./GSE120862/*.merged.bam - 12 merged by condition bam files from RNA-Seq experiment (only strand-specific data) - /https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120862
 #	- ./Homo_sapiens.GRCh38.101.gtf - Ensembl annotation file, source - http://ftp.ensembl.org/pub/release-101/gtf/homo_sapiens/Homo_sapiens.GRCh38.101.chr.gtf.gz
-#	-  - bowtie index files, source - https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-#	- -i genome size file,
+#	- bowtie index files, source - https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+#	- genome size file
 # Output files:
 #	- /seastar/tmp/tsgtf/nrtss.annotation - TSS annotation file, see more about other output in https://github.com/Xinglab/SEASTAR
 mkdir ./seastar
@@ -241,7 +241,7 @@ SEASTAR.sh \
 
 		# STEP 7 - ANNOTATE CAGE TSS CLUSTERS
 # Tools: 
-#	- R, R packages (rtracklayer, ggplot2)
+#	- R, R packages (rtracklayer)
 #	- bedtools
 #	- ./add_utrs_to_gff.py, source - https://ftp.ncbi.nlm.nih.gov/genomes/TOOLS/add_utrs_to_gff/add_utrs_to_gff.py
 # Input files:
