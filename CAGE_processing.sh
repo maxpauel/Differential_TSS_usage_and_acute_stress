@@ -345,5 +345,5 @@ cat ./Promoters/DNase_seq_data/DNase-seq.sorted.bed | awk '{print $1 "\t" $2 "\t
 bedtools merge -i ./Promoters/DNase_seq_data/DNase_seq.sorted2.bed > ./Promoters/DNase_seq_data/DNase_seq.sorted2.merged.bed
 	# Get intersected regions for ATAC-seq and DNase-seq data
 bedtools intersect -a ./Promoters/ATAC_seq_data/ATAC_seq.sorted2.merged.bed -b ./Promoters/DNase_seq_data/DNase_seq.sorted2.merged.bed >./Promoters/OCR.bed
-
+	# Determine individual promoters based on open chromatin data, differential expression and differential usage of promoters
 Rscript ./Promoters.R
