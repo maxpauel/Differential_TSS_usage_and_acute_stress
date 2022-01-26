@@ -366,10 +366,11 @@ mkdir ./CRC_clustering/temp
 Rscript ./Promoter_rank_normalization.R
 ####################  CRC clustering on GeneXplain platform  ####################
 #	Tool:analyses->methods->statistical analysis->CRC clustering		#
-#		Options: Input table - tab_ranked_dep_clustered.txt		#
+#		Options: Input table - tab_ranked_dep.txt			#
 #			 Cluster process number - 100				#
 #			 Cycles per clustering process - 100			#
 #			 Probability treshold - 0.9				#
 #			 Allow inversion - no					#
+#			 Output table - tab_ranked_dep_clustered.txt		#
 #################################################################################
 
