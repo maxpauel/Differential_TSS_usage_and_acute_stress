@@ -4,7 +4,7 @@
 #	- Trimmomatic
 # Input files:
 #	- ./Fastq/*.fastq - raw data files
-#	- ./Tru_Seq_adapters.fa - Tru_Seq adapter sequences
+#	- ./adapters.fa - Tru_Seq adapter sequences
 # Output files:
 #	- ./Fastq_trimmed/*.trim.fastq.gz - trimmed fastq files
 #	- ./Fastq_trimmed/*.trimG.fastq.gz - trimmed 5'G-clipped fastq files
@@ -20,7 +20,7 @@ res_file=$path_out$res_file
 # quality control of raw data
 fastqc $i -o ./Fastq;
 # adapter trimming and deletion of low quality reads
-java -jar /usr/share/java/trimmomatic.jar SE -threads 8 $i $res_file ILLUMINACLIP:./Tru_Seq_adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:35;
+java -jar /usr/share/java/trimmomatic.jar SE -threads 8 $i $res_file ILLUMINACLIP:./adapters.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:35;
 # single 5'-Guanine clipping
 zcat $res_file | awk '{if(NR%4==2) { if(substr($1, 1, 1) == "G") { print substr($1,2); getline; print $1; getline; print substr($1,2)} else {print $1; getline; print $1; getline; print $1}} else { print $1}}' | gzip > ${res_file%.trim.fastq.gz*}.trimG.fastq.gz;
 # quality control of trimmed data
