@@ -274,3 +274,76 @@ Rscript ./Annotate_peaks.R
 #	- ./Dif_gene_expression_and_tss_usage/Dif_tss_usage.txt - summary of differential TSS usage
 mkdir ./Dif_gene_expression_and_tss_usage
 Rscript ./Dif_gene_expression_and_tss_usage.R
+
+
+		# STEP 9 - PROMOTER SELECTION, DIFFERENTIAL PROMOTER EXPRESSION AND DIFFERENTIAL USAGE
+# Tools: 
+#	- R, R packages (DESeq,DESeq2,DRIMSeq)
+#	- bedtools
+#	- bigBedToBed (kentUtils) - source https://github.com/ENCODE-DCC/kentUtils/blob/master/src/utils/bigBedToBed/
+# Input files:
+#	- ./Expression/counts.txt - summary table of read counts by sample for each cluster
+#	- ./Annotation/annotated_CAGE_TSS_clusters.txt - annotated by genes and genomic features CAGE TSS clusters
+#	- ./Expression/design.txt - design table of experiment (samples in rows, conditions in columns)
+#	- ./DPI/outPooled/tc.spi_merged.ctssMaxCounts11_ctssMaxTpm1.bed - robust CAGE TSS clusters
+#	- ./Expression/DESeq2_normalized_counts.txt - DESeq2 normalized counts for CAGE TSS clusters
+#	- ./Promoters/Chip_seq_data/*.bb - bigBed files from GTRD database, Chip-Seq meta-clusters dor each transcription factor, source - http://gtrd20-06.biouml.org/downloads/current/gtrdHub/hg38/bigBed/ChIP-seq/Meta-clusters_by_TF/
+#	- ./Promoters/ATAC_seq_data/*.bed.gz - bed files from ENCODE database, ATAC-Seq data for human gastrocnemius medialis tissue (4 persons)
+#	- ./Promoters/DNase_seq_data/*.bed.gz - bed files from ENCODE database, DNase-Seq data for human gastrocnemius medialis tissue (4 persons)
+#	- ./chrNameLength.txt - genome size file
+# Output files:
+#	- ./Promoters/OCR.bed - bed with open chromatin regions based on ATAC-Seq and DNase-Seq data
+#	- ./Promoters/Promoters.txt - summarized data for all promoters determined in experiment
+#	- ./Promoters/Dif_expression/P1-D.txt, - ./Promoters/Dif_expression/P3-D.txt, - ./Promoters/Dif_expression/P6-D.txt - Differential promoter expression for each condition
+#	- ./Promoters/Dif_expression/Dif_promoter_usage.txt - summary of differential promoter expression
+#	- ./Promoters/Dif_expression/P1-DEP.txt, - ./Promoters/Dif_expression/P3-D_promoter_usage.txt, - ./Promoters/Dif_expression/P6-D_promoter_usage.txt - Differential promoter usage for each condition
+#	- ./Promoters/Dif_expression/Dif_promoter_usage.txt - summary of differential promoter usage
+
+mkdir ./Promoters
+mkdir ./Promoters/temp
+mkdir ./Promoters/Chip_seq_data
+mkdir ./Promoters/ATAC_seq_data
+mkdir ./Promoters/DNase_seq_data
+mkdir ./Promoters/Dif_expression
+
+	# Download Chip-seq Meta-clusters for each TF
+wget -r -l1 -t1 -nd -N -np -A.bb -erobots=off --directory-prefix ./Promoters/Chip_seq_data/ http://gtrd20-06.biouml.org/downloads/current/gtrdHub/hg38/bigBed/ChIP-seq/Meta-clusters_by_TF/ 
+	# Convert bigBed to bed
+ls ./Promoters/Chip_seq_data/*.bb | xargs -ISMPL bash -c "bigBedToBed SMPL SMPL.bed"
+	# Combine all meta-clusters to one sorted bed
+cat ./Promoters/Chip_seq_data/*.bed > ./Promoters/Chip_seq.bed
+sort -k1,1 -k2,2 < ./Promoters/Chip_seq_data/Chip_seq.bed > ./Promoters/Chip_seq_data/Chip_seq.sorted.bed
+	# Download ATAC-seq IDR thresholded peaks for each human sample (gastrocnemius medialis tissue) from ENCODE
+#ENCSR689SDA
+wget --directory-prefix ./Promoters/ATAC_seq_data/ https://www.encodeproject.org/files/ENCFF666UUK/@@download/ENCFF666UUK.bed.gz
+#ENCSR308HPZ
+wget --directory-prefix ./Promoters/ATAC_seq_data/ https://www.encodeproject.org/files/ENCFF461RJQ/@@download/ENCFF461RJQ.bed.gz
+#ENCSR258JCL
+wget --directory-prefix ./Promoters/ATAC_seq_data/ https://www.encodeproject.org/files/ENCFF034WCY/@@download/ENCFF034WCY.bed.gz
+#ENCSR823ZCR
+wget --directory-prefix ./Promoters/ATAC_seq_data/ https://www.encodeproject.org/files/ENCFF953QCT/@@download/ENCFF953QCT.bed.gz
+gunzip ./Promoters/ATAC_seq_data/*.gz 
+	# Download DNase-seq bed narrow peaks for each human sample (gastrocnemius medialis tissue) from ENCODE
+#ENCSR686WJL
+wget --directory-prefix ./Promoters/DNase_seq_data/ https://www.encodeproject.org/files/ENCFF780TDG/@@download/ENCFF780TDG.bed.gz
+#ENCSR520BAD
+wget --directory-prefix ./Promoters/DNase_seq_data/ https://www.encodeproject.org/files/ENCFF033EQB/@@download/ENCFF033EQB.bed.gz
+#ENCSR791BHE
+wget --directory-prefix ./Promoters/DNase_seq_data/ https://www.encodeproject.org/files/ENCFF884XQO/@@download/ENCFF884XQO.bed.gz
+#ENCSR856XLJ
+wget --directory-prefix ./Promoters/DNase_seq_data/ https://www.encodeproject.org/files/ENCFF909ISK/@@download/ENCFF909ISK.bed.gz
+gunzip ./Promoters/DNase_seq_data/*.gz 
+	# Combine ATAC-seq data to one sorted bed and merge open chromatin intervals
+cat ./Promoters/ATAC_seq_data/*.bed >> ./Promoters/ATAC_seq_data/ATAC-seq.bed
+sort -k 1,1 -k2,2n ./Promoters/ATAC_seq_data/ATAC-seq.bed > ./Promoters/ATAC_seq_data/ATAC-seq.sorted.bed
+cat ./Promoters/ATAC_seq_data/ATAC-seq.sorted.bed | awk '{print $1 "\t" $2 "\t" $3}' > ./Promoters/ATAC_seq_data/ATAC_seq.sorted2.bed
+bedtools merge -i ./Promoters/ATAC_seq_data/ATAC_seq.sorted2.bed > ./Promoters/ATAC_seq_data/ATAC_seq.sorted2.merged.bed
+	# Combine DNase-seq data to one sorted bed and merge open chromatin intervals
+cat ./Promoters/DNase_seq_data/*.bed >> ./Promoters/DNase_seq_data/DNase-seq/DNase-seq.bed
+sort -k 1,1 -k2,2n ./Promoters/DNase_seq_data/DNase-seq/DNase-seq.bed > ./Promoters/DNase_seq_data/DNase-seq/DNase-seq.sorted.bed
+cat ./Promoters/DNase_seq_data/DNase-seq.sorted.bed | awk '{print $1 "\t" $2 "\t" $3}' > ./Promoters/DNase_seq_data/DNase_seq.sorted2.bed
+bedtools merge -i ./Promoters/DNase_seq_data/DNase_seq.sorted2.bed > ./Promoters/DNase_seq_data/DNase_seq.sorted2.merged.bed
+	# Get intersected regions for ATAC-seq and DNase-seq data
+bedtools intersect -a ./Promoters/ATAC_seq_data/ATAC_seq.sorted2.merged.bed -b ./Promoters/DNase_seq_data/DNase_seq.sorted2.merged.bed >./Promoters/OCR.bed
+
+Rscript ./Promoters.R
