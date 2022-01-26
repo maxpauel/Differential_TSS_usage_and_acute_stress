@@ -293,6 +293,7 @@ Rscript ./Dif_gene_expression_and_tss_usage.R
 #	- ./chrNameLength.txt - genome size file
 # Output files:
 #	- ./Promoters/OCR.bed - bed with open chromatin regions based on ATAC-Seq and DNase-Seq data
+#	- ./Promoters/all_TC.bed - bed with all CAGE TSS clusters annotated by individual promoters
 #	- ./Promoters/Promoters.txt - summarized data for all promoters determined in experiment
 #	- ./Promoters/Dif_expression/P1-D.txt, - ./Promoters/Dif_expression/P3-D.txt, - ./Promoters/Dif_expression/P6-D.txt - Differential promoter expression for each condition
 #	- ./Promoters/Dif_expression/Dif_promoter_usage.txt - summary of differential promoter expression
