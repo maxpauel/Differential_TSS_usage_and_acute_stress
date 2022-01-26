@@ -221,7 +221,6 @@ q()
 n
 
 
-
 		# STEP 6 - ESTIMATE TSS FOR MUSCLE TISSUE USING RNA-SEQ DATA
 # Tools: 
 #	- SEASTAR, source - https://github.com/Xinglab/SEASTAR
@@ -296,8 +295,8 @@ Rscript ./Dif_gene_expression_and_tss_usage.R
 #	- ./Promoters/all_TC.bed - bed with all CAGE TSS clusters annotated by individual promoters
 #	- ./Promoters/Promoters.txt - summarized data for all promoters determined in experiment
 #	- ./Promoters/Dif_expression/P1-D.txt, - ./Promoters/Dif_expression/P3-D.txt, - ./Promoters/Dif_expression/P6-D.txt - Differential promoter expression for each condition
-#	- ./Promoters/Dif_expression/Dif_promoter_usage.txt - summary of differential promoter expression
-#	- ./Promoters/Dif_expression/P1-DEP.txt, - ./Promoters/Dif_expression/P3-D_promoter_usage.txt, - ./Promoters/Dif_expression/P6-D_promoter_usage.txt - Differential promoter usage for each condition
+#	- ./Promoters/Dif_expression/DEP.txt - summary of differential promoter expression
+#	- ./Promoters/Dif_expression/P1-D_promoter_usage.txt, - ./Promoters/Dif_expression/P3-D_promoter_usage.txt, - ./Promoters/Dif_expression/P6-D_promoter_usage.txt - Differential promoter usage for each condition
 #	- ./Promoters/Dif_expression/Dif_promoter_usage.txt - summary of differential promoter usage
 
 mkdir ./Promoters
@@ -348,3 +347,29 @@ bedtools merge -i ./Promoters/DNase_seq_data/DNase_seq.sorted2.bed > ./Promoters
 bedtools intersect -a ./Promoters/ATAC_seq_data/ATAC_seq.sorted2.merged.bed -b ./Promoters/DNase_seq_data/DNase_seq.sorted2.merged.bed >./Promoters/OCR.bed
 	# Determine individual promoters based on open chromatin data, differential expression and differential usage of promoters
 Rscript ./Promoters.R
+
+
+		# STEP 10 - CRC CLUSTERING OF DIFFERENTALLY EXPRESSED PROMOTERS
+# Tools: 
+#	- R
+#	- GeneXplain platform - https://platform.genexplain.com/
+# Input files:
+#	- ./Expression/DESeq2_normalized_counts.txt - DESeq2 normalized counts for CAGE TSS clusters
+#	- ./Promoters/all_TC.bed - bed with all CAGE TSS clusters annotated by individual promoters
+#	- ./Promoters/Dif_expression/DEP.txt - summary of differential promoter expression
+# Output files:
+#	- ./CRC_clustering/tab_ranked.txt - Ranked expression of all promoters
+#	- ./CRC_clustering/tab_ranked_dep.txt - Ranked expression of differentially expressed promoters
+#	- ./CRC_clustering/tab_ranked_dep_clustered.txt - Clustered ranked expression of differentially expressed promoters (geneXplain)
+mkdir ./CRC_clustering/
+mkdir ./CRC_clustering/temp
+Rscript ./Promoter_rank_normalization.R
+####################  CRC clustering on GeneXplain platform  ####################
+#	Tool:analyses->methods->statistical analysis->CRC clustering		#
+#		Options: Input table - tab_ranked_dep_clustered.txt		#
+#			 Cluster process number - 100				#
+#			 Cycles per clustering process - 100			#
+#			 Probability treshold - 0.9				#
+#			 Allow inversion - no					#
+#################################################################################
+
