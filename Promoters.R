@@ -1,4 +1,4 @@
-	# Generate .bed with major TSS clusters and 
+	# Generate .bed with major TSS clusters
 tc_ann=read.table('./Annotation/annotated_CAGE_TSS_clusters.txt',header=T)
 tc_ann_maj=tc_ann[tc_ann$major=='major',c(1,2)]
 tc=read.table('./DPI/outPooled/tc.spi_merged.ctssMaxCounts11_ctssMaxTpm1.bed')
