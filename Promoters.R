@@ -80,7 +80,7 @@ oTC=read.table('./Promoters/temp/all_TC_open.txt')
 cTCr=cTC[,1:10]
 oTCr=oTC[,1:10]
 TCr=rbind(oTCr,cTCr)
-write.table(TCr,'./Promoters/temp/all_TC.bed',quote=F,row.names=F,col.names=F,sep='\t')
+write.table(TCr,'./Promoters/all_TC.bed',quote=F,row.names=F,col.names=F,sep='\t')
 	# Get table of promoters without OCR
 n=unique(am[,c(2,17)])
 bn=merge(cTC,n,by.x='V4',by.y='name')
@@ -128,7 +128,7 @@ bid=cbind(bid,'bidirect')
 all=merge(all,bid,by.x='Row.names',by.y='bid',all=T)
 	# Estimate differential expression of promoters
 counts=read.table('./Expression/counts.txt',header=T,sep='\t')
-TC=read.table('./Promoters/temp/all_TC.bed')
+TC=read.table('./Promoters/all_TC.bed')
 TCr=TC[,c(4,10)]
 TC_counts=merge(TCr,counts,by.x='V4',by.y='row.names')
 prom_exp=aggregate(TC_counts[,3:52],by=list(TC_counts$V10), sum)
@@ -184,7 +184,7 @@ tc_ann_red=unique(tc_ann[,c(1,2,3)])
 promoters_2=merge(promoters_1,tc_ann_red,by.y='name',by.x='V4',all.x=T)
 write.table(promoters_2,'./Promoters/temp/promoters_2.txt',quote=F,row.names=F,sep='\t')
 
-tss=read.table('./Promoters/temp/all_TC.bed',header=F)
+tss=read.table('./Promoters/all_TC.bed',header=F)
 tss=tss[,c(4,10)]
 tsa=merge(tss,tc_ann_red,by.y='name',by.x='V4',all.x=T)
 tsa=unique(tsa[,2:4])
