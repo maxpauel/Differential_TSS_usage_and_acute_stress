@@ -374,3 +374,41 @@ Rscript ./Promoter_rank_normalization.R
 #			 Output table - tab_ranked_dep_clustered.txt		#
 #################################################################################
 
+
+		# STEP 11 - TFBS ENRICHMENT FOR CO-EXPRESSED CLUSTERS
+# Tools: 
+#	- R
+#	- GeneXplain platform - https://platform.genexplain.com/
+# Input files:
+#	- ./CRC_clustering/tab_ranked_dep_clustered.txt - Clustered ranked expression of differentially expressed promoters (geneXplain)
+#	- ./Promoters/Promoters.txt - summarized data for all promoters determined in experiment
+# Output files:
+#	- ./TFBS_enrichment/*.bed - bed for each cluster of promoters
+#	- ./TFBS_enrichment/reference.bed - random set of 
+#	- ./TFBS_enrichment/*.Enriched_motifs.txt - TFBS enrichment table for each promoter cluster
+mkdir ./TFBS_enrichment/
+# Generate bed of individual promoter regions for each co-expressed cluster
+promoters=read.table('./Promoters/Promoters.txt',header=T,sep='\t')
+ocr_promoters=unique(promoters[promoters$distance_tss_cluster_to_open_chromatin<201,c(4,5,6,1,10,7)])
+cl=read.table('./CRC_clustering/tab_ranked_dep_clustered.txt',header=T,sep='\t')
+cl=cl[,1:2]
+m=merge(cl,ocr_promoters,by.x='ID',by.y='promoter_id')
+n <- split(m, m$Cluster)
+l=lapply(n,function(x){x[,c(3,4,5,1,6,7)]})
+for (i in 1:length(l)) {
+  write.table(l[i], file =paste("./TFBS_enrichment/",names(l[i]), ".bed", sep = ""), col.names= F, sep = "\t", quote=FALSE, row.names= F)
+}
+# Generate reference bed of individual promoter regions
+ran=sample(1:nrow(ocr_promoters),5000)
+ref=ocr_promoters[ran,]
+write.table(ref, "./TFBS_enrichment/reference.bed", col.names= F, sep = "\t", quote=FALSE, row.names= F)
+q()
+n
+########################  TFBS enrichment on GeneXplain platform ########################
+#	Tool:analyses->methods->Site analysis->Search for enriched TFBS (tracks)	#
+#		Options: Yes set - *.bed						#
+#			 No set - reference.bed						#
+#			 Sequence source - Ensembl 104.38 Human (hg38)			#
+#			 Input motif profile - TRANSFAC(R)2021.3 vertebrate_human_p0.001#
+#			 Cutoff - 0.05							#
+#########################################################################################
