@@ -9,7 +9,6 @@
 #	- ./Fastq_trimmed/*.trim.fastq.gz - trimmed fastq files
 #	- ./Fastq_trimmed/*.trimG.fastq.gz - trimmed 5'G-clipped fastq files
 #	- ./Fastq/*.fastqc.html, ./Fastq_trimmed/*.fastqc.html - quality control files
-
 mkdir ./Fastq_trimmed
 path_in='./Fastq'
 path_out='./Fastq_trimmed'
@@ -388,6 +387,7 @@ Rscript ./Promoter_rank_normalization.R
 #	- ./TFBS_enrichment/*.Enriched_motifs.txt - TFBS enrichment table for each promoter cluster
 mkdir ./TFBS_enrichment/
 # Generate bed of individual promoter regions for each co-expressed cluster
+R
 promoters=read.table('./Promoters/Promoters.txt',header=T,sep='\t')
 ocr_promoters=unique(promoters[promoters$distance_tss_cluster_to_open_chromatin<201,c(4,5,6,1,10,7)])
 cl=read.table('./CRC_clustering/tab_ranked_dep_clustered.txt',header=T,sep='\t')
